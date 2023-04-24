@@ -1,38 +1,60 @@
-// 导入router所需的方法
-import { createRouter, createWebHistory ,RouteRecordRaw} from 'vue-router'
+import { createRouter, createWebHistory } from 'vue-router';
+// import routes from '~pages';
+import NProgress from 'nprogress';
+import 'nprogress/nprogress.css';
 
-// 导入路由页面的配置
-// import routes from '@/router'
+const route = [
+	{
+		path: '/',
+		name: 'Home',
+		component: () => import('@/views/index.vue'),
+		children: [
+			{
+				path: '',
+				name: 'index',
+				component: () => import('@/views/index/index.vue'),
+			},
+		],
+	},
+	{
+		path: '/:map',
+		name: 'map',
+		component: () => import('@/views/index.vue'),
+		children: [
+			{
+				path: '',
+				name: 'mapid',
+				component: () => import('@/views/index/index.vue'),
+			},
+		],
+	},
+	{
+		path: '/article',
+		name: '文章详情',
+		component: () => import('@/views/index.vue'),
+		children: [
+			{
+				path: ':id',
+				name: 'id',
+				component: () => import('@/views/article/index.vue'),
+			},
+		],
+	},
+];
 
-const routes = [
-    {
-        path: '/',
-        name: 'index',
-        title: '首页',
-        component: () => import('@/pages/index.vue'),}
-]
-
-// 路由参数配置
+//导入生成的路由数据
 const router = createRouter({
-    // 使用hash(createWebHashHistory)模式，(createWebHistory是HTML5历史模式，支持SEO)
-    history: createWebHistory(),
-    routes
-})
+	history: createWebHistory(),
+	routes: route,
+});
 
-// 全局前置守卫，这里可以加入用户登录判断
-router.beforeEach((to, from, next) => {
-    // 继续前进 next()
-    // 返回 false 以取消导航
-    next()
-})
+router.beforeEach(async (_to, _from, next) => {
+	NProgress.start();
+	next();
+});
 
-// 全局后置钩子，这里可以加入改变页面标题等操作
-router.afterEach((to, from) => {
-    const _title: any = to.meta.title
-    if (_title) {
-        window.document.title = _title
-    }
-})
+router.afterEach((_to) => {
+	NProgress.done();
+});
 
-// 导出默认值
-export default router
+export default router;
